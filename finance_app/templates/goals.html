@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Goals - Finance Manager{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Financial Goals</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bullseye me-2 text-warning"></i>Create New Goal</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Goal Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="target_amount" class="form-label">Target Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="target_amount" name="target_amount" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="target_date" class="form-label">Target Date</label>
+                            <input type="date" class="form-control" id="target_date" name="target_date" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-plus me-2"></i>Create Goal
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Your Goals</h5>
+                </div>
+                <div class="card-body">
+                    {% if goals %}
+                        <div class="row">
+                            {% for goal in goals %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ goal.title }}</h6>
+                                        <p class="card-text">{{ goal.description }}</p>
+                                        
+                                        <div class="mb-2">
+                                            <small class="text-muted">Target: ${{ "%.2f"|format(goal.target_amount) }}</small>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <small class="text-muted">Current: ${{ "%.2f"|format(goal.current_amount) }}</small>
+                                        </div>
+                                        
+                                        <div class="progress mb-2">
+                                            {% set percentage = (goal.current_amount / goal.target_amount * 100) if goal.target_amount > 0 else 0 %}
+                                            <div class="progress-bar bg-warning" 
+                                                 role="progressbar" 
+                                                 style="width: {{ percentage }}%">
+                                                {{ "%.1f"|format(percentage) }}%
+                                            </div>
+                                        </div>
+                                        
+                                        <small class="text-muted">Target Date: {{ goal.target_date.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">No goals set yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('target_date').value = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %} 
